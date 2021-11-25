@@ -27,7 +27,7 @@ url: "https://aterriblysadcat.github.io" # the base hostname & protocol for your
 github_username:  aTerriblySadCat
 
 # Build settings
-theme: jekyll-theme-minimal
+theme: jekyll-theme-slate
 
 # Exclude from processing.
 # The following items will not be processed, by default.
