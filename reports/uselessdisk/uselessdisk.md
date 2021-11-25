@@ -13,14 +13,15 @@ In short, it doesnâ€™t encrypt any files at all. It just overwrites the systemâ€
 
 ## Contents
 
-1. Introduction
-2. Indicators of compromise
-    - YARA rule
-    - EXE hashes
-    - Sector hashes
-    - Debug hashes
-    - Loaded Libraries
-    - Timestamps
+<dl>
+<dt>1. Introduction</dt>
+<dt>2. Indicators of compromise</dt>
+<dd>2.1. YARA rule</dd>
+<dd>2.2. EXE hashes</dd>
+<dd>2.3. Sector hashes</dd>
+<dd>2.4. Debug hashes</dd>
+<dd>2.5. Loaded Libraries</dd>
+<dd>2.6. Timestamps</dd>
 3. Mitigation & remediation
     - Better prevented than cured!
     - In case of concern
@@ -37,3 +38,4 @@ In short, it doesnâ€™t encrypt any files at all. It just overwrites the systemâ€
 6. Conclusion
     - Pitroxin.A
     - The analysis process
+</dl>
