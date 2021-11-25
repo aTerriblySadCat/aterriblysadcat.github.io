@@ -11,3 +11,4 @@ May your journeys down the rabbit holes made available here be entertaining!
 ## Malware Reports
 
 * [UselessDisk](./reports/uselessdisk/uselessdisk.html) (11/25/2021)
+    * [UselessDisk Addendum](./reports/uselessdisk/uselessdiskaddendum.html)
