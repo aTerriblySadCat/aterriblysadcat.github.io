@@ -10,4 +10,4 @@ May your journeys down the rabbit holes made available here be entertaining!
 
 ## Malware Reports
 
-* [UselessDisk](./reports/uselessdisk.md)
+* [UselessDisk](./reports/uselessdisk/uselessdisk.md)
