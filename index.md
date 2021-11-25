@@ -10,7 +10,7 @@ The pages are hosted on Github (obviously): [https://github.com/aTerriblySadCat/
 
 Every single one has been cat approved (again, obviously).
 
-May your journeys down the rabbit holes made available here be entertaining!
+May your journeys down the rabbit holes made available here be most entertaining!
 
 ## Malware Reports
 
