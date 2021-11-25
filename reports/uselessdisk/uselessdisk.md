@@ -62,7 +62,7 @@ rule UselessDisk
       yara_version = ">=4.1.3"
       author = “Martijn van den Berk”
    strings:
-      // The Bitcoin address ascociated with the UselessDisk sample that was analyzed
+      // The Bitcoin address associated with the UselessDisk sample that was analyzed
       $bitcoin_address = "1GZCw453MzQr8V2VAgJpRmKBYRDUJ8kzco"
 
       // The bytes before the main message that are written to the boot record
@@ -78,7 +78,7 @@ rule UselessDisk
 
       // The message shown to the user upon their system being compromised 
       $warning_message_1 = "ooops,your important files are encrypted." nocase
-      $warning_message_2 = "if you see this text,then your files are not ac-cessible,because they've been" nocase
+      $warning_message_2 = "if you see this text,then your files are not accessible,because they've been" nocase
       $warning_message_3 = "encrypted.maybe you're busy looking for a way to recover your files,but don't" nocase
       $warning_message_4 = "waste your time.nobody can recover your files without our decryption service." nocase
       $warning_message_5 = /in order to decrypt\.please send \$\d+ worth of bitcoin to this address\:/ nocase
@@ -126,17 +126,17 @@ Here is a piece of advice to prevent this malware from affecting your system(s).
 
 ### 3.2. In case of concern
 
-Should there still be concern an infection may occur, here are some tips that should make recovery of the system far less painful.
+Should there still be concern an infection may occur, here are some tips that should make recovery of an infected system far less painful.
 
 1. Make it possible to access the hard disk directly.
     - With virtual machines and the like this is trivial as the hard disk exists as a file on the host system. The malicious boot sector can then be easily overwritten with a valid one.
-    - However, for physical machines it’s important to have the proper hardware/software in place to allow for direct reading/writing of the hard disk.
+    - However, for physical machines it’s important to have the proper hardware/software in place to allow for direct reading/writing of the hard disk. No accessing the disk from the infected host allowed!
 2. Keep a valid boot record at hand.
     - Though it’ll most likely be easy enough to find a proper boot record, taken from a non-infected system, it is handy to keep a valid one easily accessible.
     - This valid boot record can then be used to overwrite the malicious boot record, curing the infection.
 3. Full system backups!
     - For this specific malware it may be overkill as it does not actually encrypt any files, but in general it’s a good idea to make regular backups of important systems.
-    - It is also advised to store this backup off the system itself. This way it is less likely to be tampered with or become inaccessible (like with this specific malware).
+    - It is also advised to store this backup on another system. This way it is less likely to be tampered with or become inaccessible (like with this specific malware).
 
 ### 3.3. The cure
 
@@ -197,11 +197,11 @@ Everything found beyond this point is highly technical, so all ye who enter bewa
 
 The entire malware can essentially be boiled down to this single function.
 
-We will be going through this malware, one function at a time.
+We will be going through this function, one interesting line at a time.
 
 ![FUN_00401010](./images/13 - A pretty interesting function.png)
 
-### 5.2. FUN_004012e0
+#### 5.2. FUN_004012e0
 
 The first function we will be looking into is the only interesting, non-Win32 function this malware makes use of.
 
@@ -224,11 +224,11 @@ The purpose of this function seems to be to write the data at the DAT_00426a30 m
 
 The FOR statement seen here is tied to the assembly OP MOVSD.REP by Ghidra. REP means it is repeated a set number of times. MOVSD copies a doubleword (2 bytes, the same as a UTF-16 encoded char) from one memory address to another.
 
-The IF statement can be ignored as it doesn’t pass with a param_3 of 1E0.
+The IF statement can be ignored as it doesn’t pass with a param_3 of 1E0. Which is hardcoded into the malware.
 
-Though not stated with 100% certainty, this function seems to be very similar to the C++ memcpy function in behavior. Perhaps a custom variant, or an older version. Or maybe one of its many alternatives. It is hard to say, but what can be said is that the behavior is very similar.
+Though not stated with 100% certainty, this function seems to be very similar to the C++ memcpy function in behavior. Perhaps a custom variant, or an older version. Or maybe one of its many alternatives. It is hard to say, but what can be said is that the behavior is very similar and the function serves the same purpose when used by the malware.
 
-### 5.3. CreateFileA
+#### 5.3. CreateFileA
 
 This is a Win32 function from kernel32.dll.
 
@@ -246,7 +246,7 @@ Then a value of 3 is given to the dwCreationDisposition field and it’s set to 
 
 Which makes sense, as the physical drive with the boot record is very likely to exist. Would be weird if it didn’t, right?
 
-### 5.4. DeviceIoControl
+#### 5.4. DeviceIoControl
 
 This function appears twice, and both will be tackled here.
 
@@ -256,23 +256,23 @@ The second is the dwIoControlCode, which determines what kind of command is sent
 
 The only other parameter used is a reference to the local_10 memory address, which is to hold the bytes written to the output buffer. Interesting, since the variable isn’t used afterwards. And yes, it is optional.
 
-### 5.5. WriteFile
+#### 5.5. WriteFile
 
 Now we’ve arrived at the function where it all happens. This is where the malware makes your boot record a right old mess.
 
 The first parameter, hFile, is the local_8 variable again, as it is the HANDLE to the first physical drive.
 
-Then the buffer, a reference to the local_210 memory address, is passed to the function. Remember from before? The non-Win32 function? It is this variable that holds the malicious boot record, and that function wrote it into the variable.
+Then the buffer, a reference to the local_210 memory address, is passed to the function. Remember from before? The non-Win32 function? It is this variable that holds the malicious boot record, and FUN_004012e0 wrote it into the variable.
 
 Then a hard coded value, the number of bytes to write. 0x200, which translates to 512 in decimal, and is exactly how large the boot record is in bytes. At least on a Windows machine.
 
 And finally (excluding the unused field) a reference to the local_c memory address to where the number of bytes written are to be written. Lots of writes over here.
 
-### 5.6. CloseHandle
+#### 5.6. CloseHandle
 
 The handle to the first physical drive is closed here. Nothing special. Just some cleanup.
 
-### 5.7. WinExec
+#### 5.7. WinExec
 
 And this little function runs the operation “shutdown -r -t 0” which causes the system to reboot immediately.
 
@@ -284,13 +284,15 @@ Even so if it should continue the ExitProcess function is called. This again cut
 
 And that is the grand finale of this strange, little piece of malware.
 
-Looking at not just the simplicity of the malware, but also the way the malware was designed, I feel it’s safe to say that either the person who created it is very inexperienced or experimenting with what’s possible.
+Looking at not just the simplicity of the malware, but also the way the malware was designed, I feel it’s safe to say that either the person who created it is very inexperienced or experimenting with what’s possible. Didn't care, maybe? What about a lack of time to develop the malware further? Many different possibilities. I like to think however made it went for a hot dog and left their PC unlocked, only to have a colleague trying to pull a prank but accidentally upload the malware. Perhaps one day we will know.
 
 However, it’s important not to underestimate malware, even one as silly as this. To a person who didn’t invest the time studying the malware’s assembly and operation it very much seems that the files on the system have been encrypted.
 
 This was also my first assumption. Later I found out what was really happening, and I was quite surprised. Especially considering the ease with which system encryption can be implemented. Even back in the prehistoric era known as ‘2018’, during which this malware was allegedly compiled.
 
-Though when push comes to shove, the malware is a nuisance at best. Requiring a tech savvy individual to write a proper boot record to the infected hard drive. That’s all there is to it, thankfully.
+It may very well be that a company panics and wishes to solve the problem quickly, so they could choose to pay the $300 decryptor price. There is a lack of a deadline, however, unlike many contemporary malware threats, there isn't much of an aggressive push towards companies to hurry and get their files decrypted. The likelihood of this malware succeeding were rather low from the start.
+
+The malware, in truth, is a nuisance at best. Requiring a tech savvy individual to write a proper boot record to the infected hard drive. That’s all there is to it, thankfully.
 
 ### 6.1. Pitroxin.A
 
