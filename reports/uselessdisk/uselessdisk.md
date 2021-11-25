@@ -284,7 +284,9 @@ Even so if it should continue the ExitProcess function is called. This again cut
 
 And that is the grand finale of this strange, little piece of malware.
 
-Looking at not just the simplicity of the malware, but also the way the malware was designed, I feel it’s safe to say that either the person who created it is very inexperienced or experimenting with what’s possible. Didn't care, maybe? What about a lack of time to develop the malware further? Many different possibilities. I like to think however made it went for a hot dog and left their PC unlocked, only to have a colleague trying to pull a prank but accidentally upload the malware. Perhaps one day we will know.
+Looking at not just the simplicity of the malware, but also the way the malware was designed, I feel it’s safe to say that either the person who created it is very inexperienced or experimenting with what’s possible. Didn't care, maybe? What about a lack of time to develop the malware further? Many different possibilities.
+
+I like to think whoever made it went for a hot dog and left their PC unlocked, only to have a colleague trying to pull a prank but accidentally upload the malware. Perhaps one day we will know.
 
 However, it’s important not to underestimate malware, even one as silly as this. To a person who didn’t invest the time studying the malware’s assembly and operation it very much seems that the files on the system have been encrypted.
 
