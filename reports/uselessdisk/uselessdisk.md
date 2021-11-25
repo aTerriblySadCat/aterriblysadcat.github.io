@@ -22,20 +22,20 @@ In short, it doesnâ€™t encrypt any files at all. It just overwrites the systemâ€
 <dd>2.4. Debug hashes</dd>
 <dd>2.5. Loaded Libraries</dd>
 <dd>2.6. Timestamps</dd>
-3. Mitigation & remediation
-    - Better prevented than cured!
-    - In case of concern
-    - The cure
-4. Malware summary - A wolf lacking teeth
-5. Malware deep dive - The little engine that couldn't
-    - The money function
-    - FUN_004012e0
-    - CreateFileA
-    - DeviceIoControl
-    - WriteFile
-    - CloseHandle
-    - WinExec
-6. Conclusion
-    - Pitroxin.A
-    - The analysis process
+<dt>3. Mitigation & remediation</dt>
+<dd>3.1. Better prevented than cured!</dd>
+<dd>3.2. In case of concern</dd>
+<dd>3.3. The cure</dd>
+<dt>4. Malware summary - A wolf lacking teeth</dt>
+<dt>5. Malware deep dive - The little engine that couldn't</dt>
+<dd>5.1. The money function</dd>
+<dd>5.2. FUN_004012e0</dd>
+<dd>5.3. CreateFileA</dd>
+<dd>5.4. DeviceIoControl</dd>
+<dd>5.5. WriteFile</dd>
+<dd>5.6. CloseHandle</dd>
+<dd>5.7. WinExec</dd>
+<dt>6. Conclusion</dt>
+<dd>6.1. Pitroxin.A</dd>
+<dd>6.2. The analysis process</dd>
 </dl>
