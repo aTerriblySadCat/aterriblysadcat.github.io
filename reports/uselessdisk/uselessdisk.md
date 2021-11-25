@@ -14,25 +14,25 @@ In short, it doesnâ€™t encrypt any files at all. It just overwrites the systemâ€
 ## Contents
 1. Introduction
 2. Indicators of compromise
-    1. YARA rule
-    2. EXE hashes
-    3. Sector hashes
-    4. Debug hashes
-    5. Loaded Libraries
-    6. Timestamps
+    - YARA rule
+    - EXE hashes
+    - Sector hashes
+    - Debug hashes
+    - Loaded Libraries
+    - Timestamps
 3. Mitigation & remediation
-    1. Better prevented than cured!
-    2. In case of concern
-    3. The cure
+    - Better prevented than cured!
+    - In case of concern
+    - The cure
 4. Malware summary - A wolf lacking teeth
 5. Malware deep dive - The little engine that couldn't
-    1. The money function
-    2. FUN_004012e0
-    3. CreateFileA
-    4. DeviceIoControl
-    5. WriteFile
-    6. CloseHandle
-    7. WinExec
+    - The money function
+    - FUN_004012e0
+    - CreateFileA
+    - DeviceIoControl
+    - WriteFile
+    - CloseHandle
+    - WinExec
 6. Conclusion
-    1. Pitroxin.A
-    2. The analysis process
+    - Pitroxin.A
+    - The analysis process
