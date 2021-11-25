@@ -14,7 +14,6 @@ In short, it doesnâ€™t encrypt any files at all. It just overwrites the systemâ€
 ## Contents
 
 1. Introduction
-
 2. Indicators of compromise
     - YARA rule
     - EXE hashes
@@ -22,14 +21,11 @@ In short, it doesnâ€™t encrypt any files at all. It just overwrites the systemâ€
     - Debug hashes
     - Loaded Libraries
     - Timestamps
-
 3. Mitigation & remediation
     - Better prevented than cured!
     - In case of concern
     - The cure
-
 4. Malware summary - A wolf lacking teeth
-
 5. Malware deep dive - The little engine that couldn't
     - The money function
     - FUN_004012e0
@@ -38,7 +34,6 @@ In short, it doesnâ€™t encrypt any files at all. It just overwrites the systemâ€
     - WriteFile
     - CloseHandle
     - WinExec
-    
 6. Conclusion
     - Pitroxin.A
     - The analysis process
