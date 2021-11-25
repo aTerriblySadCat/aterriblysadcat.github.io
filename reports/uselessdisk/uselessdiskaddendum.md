@@ -36,7 +36,7 @@ Following here is the environment and the tools used to analyze the UselessDisk 
 
 All systems, aside from the Host, are virtual machines running on the Host within VirtualBox. Snapshots were taken of the systems before the analysis.
 
-The pfSense firewall has a NAT rule to allow traffic SSH (port 22) traffic from the host via OPT1 to reach the Ubuntu Server that is on the LAN.
+The pfSense firewall has a NAT rule to allow SSH (port 22) traffic from the host via OPT1 to reach the Ubuntu Server that is on the LAN.
 
 The pfSense firewall also has a firewall rule that allows HTTPS (port 443) traffic from the host via OPT1 to reach itself.
 
@@ -103,8 +103,9 @@ Now for the actual analysis process, described in detail with screenshots of imp
 - Upon checking the strings found in the PE, some interesting results came by.
     - DeviceIoControl was one that immediately jumped out. It was the only one I had not yet heard of, nor had any idea what it did.
     - So, after a quick search I discovered it is used to send Kernel level messages to devices. A very strange, and interesting function. A prime target.
-- After this find I found it comfortable enough to open the application up in Ghidra to see how it operated.
-    - Keeping the DeviceIoControl function in mind.
+    - [https://docs.microsoft.com/en-us/windows/win32/api/ioapiset/nf-ioapiset-deviceiocontrol](https://docs.microsoft.com/en-us/windows/win32/api/ioapiset/nf-ioapiset-deviceiocontrol)
+- After this discovery I found it comfortable enough to open the malware in Ghidra to see what its guts looked like.
+    - Keeping the DeviceIoControl function in mind, of course.
 
 
 ![Ghidra](./images/13 - A pretty interesting function.png)
@@ -113,6 +114,7 @@ Now for the actual analysis process, described in detail with screenshots of imp
     - From the rest of the code it can also be spotted, particularly the WinExec at the bottom and the WriteFile near the center, that this function was very important to the malware.
 - After having spent some time looking up what all the function variables could be I spent some time hunting down their values.
     - Tools were also made to help with this. A tool that allows for guesses at how combined flags were made was created to help simplify this process. This allowed me to discovery that the 0xC flag in CreateFileA was a combined GENERIC_WRITE/GENERIC_READ flag.
+    - [https://github.com/aTerriblySadCat/Windows-Flag-Decoder](https://github.com/aTerriblySadCat/Windows-Flag-Decoder)
 
 
 ![GhidraDATLocation](./images/14 - Here we have the mysterious DAT value highlighted, which seems to be the string shown after the lock.png)
@@ -140,13 +142,13 @@ Now for the actual analysis process, described in detail with screenshots of imp
 
 ![xDBG32Debug](./images/18 - As can be seen here, this is the data that is written to disk.png)
 
-- With here the reference to the memory location 19FCD4 in the ECX register. This is the memory address pointed at by the local_210 variable.
+- Seen here is the reference to the memory location 19FCD4 in the ECX register. This is the memory address pointed at by the local_210 variable.
 - Then I let the WriteFile execute and see what changed on the system.
 
 
 ![FileActivityWatch](./images/19 - The five bytes are written directly to the hard disk, but nothing else happens.png)
 
-- This was also the point where I became quite sure that the malware did not encrypt any files on the files.
+- This was also the point where I became quite sure that the malware did not encrypt any files.
     - The only writes performed by the malware seemed to happen in the money function, and it only writes 512 bytes to PHYSICALDISK0.
 
 
@@ -170,13 +172,16 @@ Now for the actual analysis process, described in detail with screenshots of imp
 - Using a tool that I created to quickly find strings in large files (11GB in this case) I discovered that the Bitcoin address associated with the malware was found twice instead of the expected once.
     - The reason for this would later turn out to be that one is the boot record entry, and the other is the string in the executable on the disk.
     - I used the tool on the host, where I had full access to the VM hard disk file.
+    - [https://github.com/aTerriblySadCat/String-Extractor](https://github.com/aTerriblySadCat/String-Extractor)
 - Upon realizing how the malware operated, not actually encrypting files I theorized that it should be possible to unlock the system.
     - For this reason, I created a tool that allowed me to read and write bytes to specific parts in a file.
     - I used this to analyze the way boot records operate and what a proper boot record should look like.
     - I then overwrote the 512 bytes of malicious boot record with a valid one and started the machine up again.
     - It worked like a charm.
     - Though untested on a physical hard disk, it should work the same since nothing else is touched by the malware. Just the 512 bytes on PHYSICALDRIVE0.
-- After having figured out what the malware does in general terms and having found a cure for the infection, I decided to take a closer at one function I did not figure out quite yet. The one non-Win32 
+    - [https://github.com/aTerriblySadCat/Byte-Reader](https://github.com/aTerriblySadCat/Byte-Reader)
+    - [https://github.com/aTerriblySadCat/Byte-Writer](https://github.com/aTerriblySadCat/Byte-Writer)
+- After having figured out what the malware does in general terms and having found a cure for the infection, I decided to take a closer at the one function I did not figure out quite yet. The one non-Win32 function.
 
 
 ![FUN_004012e0](./images/29 - FUN_004012e0.png)
@@ -188,13 +193,12 @@ Now for the actual analysis process, described in detail with screenshots of imp
 
 ![ForLoop](./images/30 - The for statement the param3 is used in.png)
 
-- Within Ghidra it is also shown that this FOR loop is an assembly op referred to as MOVSD.REP
+- Within Ghidra it is also shown that this FOR loop is an assembly OP referred to as MOVSD.REP
     - The REP part refers to the fact that it is repeating.
     - The MOVSD part refers to the moving of data from one register to another. A doubleword, to be exact, which is 2 bytes.
     - It also happens that UTF-16 encoded characters are 2 bytes in size. Therefore, this may be an indication that the characters are UTF-16 encoded.
 - Upon some further investigation, it seems memcpy is VERY similar to the FUN function.
     - [https://www.cplusplus.com/reference/cstring/memcpy/](https://www.cplusplus.com/reference/cstring/memcpy/)
-    - Some more investigation required!
 - It seems they do not compile the same, however, something similar to how the FOR loop works is done with memcpy, so it or something similar may convert to it.
     - It is for these reasons that I don’t think the mystery function is some custom, dynamic boot record generator.
     - It is probably either a custom function similar to memcpy (perhaps so there’re less dependencies needed), a variant of memcpy, or a much older version of memcpy.
