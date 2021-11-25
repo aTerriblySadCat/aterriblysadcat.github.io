@@ -12,7 +12,9 @@ However, as research into the malware progressed it turned out that UselessDisk 
 In short, it doesn’t encrypt any files at all. It just overwrites the system’s boot sector with its own malicious boot record which it then boots into on reboot and subsequent boots. More boots here than in a Dr. Martens factory.
 
 ## Contents
+
 1. Introduction
+
 2. Indicators of compromise
     - YARA rule
     - EXE hashes
@@ -20,11 +22,14 @@ In short, it doesn’t encrypt any files at all. It just overwrites the system�
     - Debug hashes
     - Loaded Libraries
     - Timestamps
+
 3. Mitigation & remediation
     - Better prevented than cured!
     - In case of concern
     - The cure
+
 4. Malware summary - A wolf lacking teeth
+
 5. Malware deep dive - The little engine that couldn't
     - The money function
     - FUN_004012e0
@@ -33,6 +38,7 @@ In short, it doesn’t encrypt any files at all. It just overwrites the system�
     - WriteFile
     - CloseHandle
     - WinExec
+    
 6. Conclusion
     - Pitroxin.A
     - The analysis process
