@@ -4,7 +4,7 @@
 
 Hello and welcome to my little analysis corner!
 
-Here is where I post my malware reports for all to see. Or all who want to see, more like it.
+Here is where I (Martijn van den Berk, also known as aTerriblySadCat) post my malware reports for all to see. Or all who want to see, more like it.
 
 The pages are hosted on Github (obviously): [https://github.com/aTerriblySadCat/aterriblysadcat.github.io](https://github.com/aTerriblySadCat/aterriblysadcat.github.io)
 
