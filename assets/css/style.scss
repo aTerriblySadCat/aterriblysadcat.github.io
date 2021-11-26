@@ -1,0 +1,17 @@
+---
+---
+
+@import "jekyll-theme-slate";
+
+OL { counter-reset: item }
+UL { counter-reset: item }
+LI { display: block }
+LI:before { content: counters(item, ".") ". "; counter-increment: item; font-weight: 700 }
+
+UL LI:before {
+    content: "- "; 
+    counter-increment: none;
+    font-weight: 400;
+}
+
+OL, LI, UL { margin-bottom: 0px }
