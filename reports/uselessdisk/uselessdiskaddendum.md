@@ -1,7 +1,3 @@
-**[Home](/index.html)**
-
-* * *
-
 # UselessDisk Addendum
 
 Written by Martijn van den Berk.

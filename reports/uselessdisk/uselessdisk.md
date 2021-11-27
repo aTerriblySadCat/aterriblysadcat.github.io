@@ -1,7 +1,3 @@
-**[Home](/index.html)**
-
-* * *
-
 # UselessDisk
 ## The name says it all.
 
@@ -12,7 +8,7 @@ Published on the 25th of November, 2021.
 <div id="introduction"/>
 
 ## 1. Introduction
-UselessDisk, a piece of malware found running in the Any.Run sandbox. Its victim? A 32-bit Windows 7 system. Identified by its behavior as a piece of ransomware and a locker, it was a prime target for practicing malware analysis given the prevalence of ransomware in today’s environment.
+UselessDisk, a piece of malware found running in the [Any.Run sandbox](https://app.any.run/tasks/7bbd6717-8067-4e9c-a201-f0b431312402/). Its victim? A 32-bit Windows 7 system. Identified by its behavior as a piece of ransomware and a locker, it was a prime target for practicing malware analysis given the prevalence of ransomware in today’s environment.
 
 However, as research into the malware progressed it turned out that UselessDisk really does do its name justice. What seemed on the surface to be a nasty piece of ransomware was nothing more than a sheep in wolf’s clothing. Talking the talk, but not walking the walk.
 
@@ -67,7 +63,7 @@ As alluded to in the introduction, this malware is not what it seems to be on th
 
 The malware was run on both a 64-bit Windows 10 and a 32-bit Windows 7 system for testing purposes. The malware behaved the same on both systems.
 
-If run without administrator privileges it does nothing. The reason for this is a call to the CreateFileA function, but more on this later. Once the malware is run with the elevated privileges nothing seems to happen and then the system suddenly restarts.
+If run without administrator privileges it does nothing. The reason for this is a call to the CreateFileA function, but more on this later. Once the malware is run with the elevated privileges it seems as though nothing happens, but then the system suddenly restarts.
 
 After the system has restarted, the user is greeted with the following screen. Alerting them of their dire circumstances.
 
@@ -77,11 +73,11 @@ As stated above, it claims that all files have been encrypted and that a decrypt
 
 ![BitcoinWallet](./images/28 - No payments made. Though luck bud.png)
 
-Thankfully though, nobody has lost any money on this little trickster. That would’ve been unfortunate, for none of the files are encrypted.
+Thankfully though, nobody has lost any money on this little trickster. That would’ve been unfortunate, for none of the files have been encrypted.
 
-What the malware does is very simple. It writes the warning message seen above (plus some leading and trailing bytes) to the boot record on the first physical drive of the system (the disk that holds the MBR, as defined by Windows). Thus, when the user boots into the system again they are greeted to this screen instead of their usual Windows environment.
+What the malware does is very simple. It writes the warning message seen above (plus some leading and trailing bytes) to the boot record on the first physical drive of the system (a boot record as according to the MBR format). Thus, when the user boots into the system again (via the BIOS boot style, not UEFI) they are greeted to this screen instead of their usual Windows environment.
 
-One of the many things that make this malware so silly is that it does not actually encrypt, delete, or otherwise change any data. Aside from the first 512 bytes in the MBR so the system displays the message instead of booting into Windows.
+One of the many things that make this malware so silly is that it does not actually encrypt, delete, or otherwise change any other data. It's bluffing.
 
 Though you may now ask yourself, what exactly does it do? And what other things make it so silly?
 
@@ -96,6 +92,8 @@ For this chapter we will be going in-depth into the exact functioning of the mal
 For static analysis, Ghidra was used on a 64-bit Windows 10 Pro system.
 
 For the dynamic analysis the malware was run with administrator privileges in xDBG32 on a 64-bit Windows 10 Pro system.
+
+To get an overview of the full testing environment, see the [addundum](./uselessdiskaddendum.md#malware-analysis-setup).
 
 Everything found beyond this point is highly technical, so all ye who enter beware!
 
@@ -193,15 +191,15 @@ Here we can see that maliciousBootRecordAddr, DAT_maliciousBootRecordAddr, and 4
     </ol>
 </section>
 
-The one thing to note is how 480 bytes are written, instead of the standard MBR size of 512 bytes. The reason for this that the malicious boot record is 468 bytes in size, so no more must be written. The extra 12 bytes don't matter to the MBR if they are zero. The only other thing that matters is what we see right underneath. What is done with the remaining 32 bytes is covered below.
+The one thing to note is how 480 bytes are written, instead of the standard MBR size of 512 bytes. The reason for this that the malicious boot record is 468 bytes in size, so no more needs to be written. The extra 12 bytes don't matter for the MBR format if they are zero. The only other thing that matters is what we see right underneath. What happens with the remaining 32 bytes?
 
-local_12 and local_11 have the values 0x55 and 0xAA written into them. The reason for this is that every MBR must end with 0x55 and 0xAA.
+local_12 and local_11 have the values 0x55 and 0xAA written into them. The reason for this is that every boot record must end with 0x55 and 0xAA.
 
 By simply assigning these two variables, they are placed in the correct memory addresses. We can see this in the assembly. Quite interesting how memory is aligned so things work out this way.
 
 ![WritingTheFinalTwoBytes](./images/6 - The final two bytes written into memory.png)
 
-![ReturningAddress](./images/14 - Returning the address aligns the register perfectly.png)
+![ReturningAddress](./images/14 - Returning the address alligns the register perfectly.png)
 
 Now for the explaining.
 
@@ -254,11 +252,11 @@ It takes the following parameters:
     </ol>
 </section>
 
-The as stated above, PHYSICALDRIVE0 refers to the first physical drive. This drive is defined by Windows to be the drive holding the boot record. It is this that makes the malware very happy.
+As stated above, PHYSICALDRIVE0 refers to the first physical drive. This drive is defined by Windows to be the drive holding the boot record. It is this that makes the malware very happy.
 
 Yet this function is also the reason why the malware appears to do nothing when it's run without administrator privileges.
 
-As can be seen, if the hPhysicalDrive0 is an INVALID_HANDLE_VALUE the program terminates. And it needs administrator privileges to open the PHYSICALDRIVE0 with read and write access.
+As can be seen, if the hPhysicalDrive0 is an INVALID_HANDLE_VALUE the program terminates. Basically access denied, as it needs administrator privileges to open the PHYSICALDRIVE0 with read and write access.
 
 <div id="deviceiocontrol"/>
 
@@ -371,11 +369,15 @@ Now, since this malware is completely focused on infecting a boot record, we wil
 
 ![HealthyBootRecord](./images/16 - Healthy MBR boot record.png)
 
-Above us we see a MBR at the start of the disk. Sector 0 with an offset of 0 bytes.
+Above us we see a non-infected, Windows 10 MBR at the start of the disk. Sector 0 with an offset of 0 bytes.
 
 ![InfectedBootRecord](./images/17 - Infected MBR boot record.png)
 
 And here we see the same boot record, but infected. The easiest way to see the change is by looking at the ASCII text to the right. As we can see, the boot record has been overwritten and the device can no longer boot into Windows.
+
+Pretty straightforward, right? Now, there is another manner in which devices can boot. Instead of BIOS booting, which just looks at the first 512 bytes of the boot disk, one can boot using UEFI. This works differently, and under Windows this manner of booting is tied to the GPT format, instead of MBR.
+
+Let's look at that now.
 
 ![HealthyGPTRecord](./images/18 - The EFI non-infected boot record.png)
 
@@ -401,6 +403,8 @@ UEFI on the other hand works differently. I will not go into how exactly it work
 
 MBR/BIOS and GPT/UEFI are very closely linked to one another. Therefore, it's fair to say that the malware only works with MBR, but technically it's the firmware who's to blame.
 
+But very simply put, exclusively booting with UEFI causes the malware to malfunction. It will still lock the device, but the warning message is not shown. Only BIOS boot will allow the message to be shown.
+
 <div id="but-why"/>
 
 ### 4.1. But why?
@@ -411,9 +415,9 @@ Even if you are interested, do your own research too! There are many misconcepti
 
 Though as I was saying, I have a hunch as to why this malware is designed to exclusively work with BIOS.
 
-Considering the malware was created in 2018 (proof of this can be seen in the conclusion below) and targeted Windows 7 machines it is very likely that UEFI was not at all of concern to the developers. Windows 7 is quite messy to get working with UEFI style booting. And there weren't many devices that solely relied on UEFI boot. At least as compared to today. Hell, even today most UEFI systems still allow the option to set BIOS style booting.
+Considering the malware was created in 2018 (proof of this can be seen in the conclusion below) and targeted Windows 7 machines it is very likely that UEFI was not at all of concern to the developers. Windows 7 is quite messy to get working with UEFI style booting. And there weren't many devices that solely relied on UEFI boot. At least as compared to today. Hell, even today most UEFI systems still allow the option to set BIOS style booting or use it as backup boot method.
 
-I think that because the target systems are exclusively Windows (Windows 7 in particular) and since UEFI booted Windows 7 systems were much rarer there wasn't a big reason to implement UEFI compatibility.
+I think that because the target systems are exclusively Windows (Windows 7 in particular) and since Windows 7 systems that boot exclusively via UEFI were much rarer there wasn't a big reason to implement UEFI compatibility.
 
 Especially considering how much different UEFI is as compared to BIOS. BIOS simply reads the first 512 bytes. UEFI has a whole process it goes through before booting. It'd require far more work (relatively speaking) to implement something like that for potentially very little gain.
 
