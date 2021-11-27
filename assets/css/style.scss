@@ -4,9 +4,8 @@
 @import "jekyll-theme-slate";
 
 OL { counter-reset: item }
-UL { counter-reset: item }
 LI { display: block }
-LI:before { content: counters(item, ".") ". "; counter-increment: item; font-weight: 700 }
+LI::before { content: counters(item, ".") ". "; counter-increment: item; font-weight: 700 }
 
 UL LI:before {
     content: "- "; 
